@@ -6,5 +6,5 @@ The full product spec and build plan is in **docs/SPEC.md**. Read it completely 
 
 - Build milestone by milestone as described in SPEC.md §9, starting with M0.
 - Log decisions in docs/DECISIONS.md and progress in docs/PROGRESS.md.
-- Commit after each milestone; work on a branch per milestone (`m0-foundation`, `m1-upload-playback`, …) and open a PR to `main`.
+- The repo is https://github.com/cyber-TaSO/TLiner and is the source of truth. Follow the GitHub workflow in SPEC.md §11: issue per milestone, branch per milestone (`m0-foundation`, …), PR to `main`, green CI before merge, never commit secrets.
 - You may install any tools, runtimes and libraries you need.

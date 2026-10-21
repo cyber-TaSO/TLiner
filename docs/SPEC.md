@@ -21,6 +21,7 @@ Working rules:
 5. Never hard-code secrets. Use `.env` with a committed `.env.example`.
 6. Write a `README.md` that a non-developer team lead could follow to install it.
 7. If something in this spec is ambiguous, pick the simplest option that keeps the door open, note it in `DECISIONS.md`, and continue.
+8. **All work lives on GitHub** in `cyber-TaSO/TLiner` — follow the workflow in §11.
 
 ---
 
@@ -226,6 +227,48 @@ Local Whisper transcription + global search, command palette, shortcut editor, t
 - `docker compose up` on a fresh VPS gives a working HTTPS instance (Caddy) in under 10 minutes following README.
 - Desktop installer runs offline with no setup.
 - Test suite green; e2e covers upload → comment → approve.
+- All milestones merged to `main` via PRs on GitHub with green CI; a tagged GitHub Release ships the Docker image and desktop installers.
 - `docs/` contains: README, SELF_HOSTING.md (VPS + R2 + Google Drive setup, cost table), DECISIONS.md, PROGRESS.md, API docs.
 
-Start with **M0** now.
+---
+
+## 11. GitHub workflow (source of truth)
+
+The project lives at **https://github.com/cyber-TaSO/TLiner** (owner: `cyber-TaSO`, default branch `main`). It is shared with the team; treat GitHub, not any local machine, as the source of truth.
+
+**Branches & PRs**
+- `main` is always runnable. Never commit straight to it after the initial scaffold.
+- One branch per milestone: `m0-foundation`, `m1-upload-playback`, `m2-comments`, … Smaller fixes use `fix/<short-name>`, features `feat/<short-name>`.
+- Open a **pull request to `main`** for every milestone/feature. PR description: what was built, how to test it, acceptance checks from §9 with ✅/❌, screenshots or short recordings for UI work, known issues.
+- Merge only when CI is green. Squash-merge, then delete the branch.
+- Before starting new work: `git fetch origin && git rebase origin/main` (teammates may have pushed).
+
+**Commits**
+- Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `ci:` with a clear subject line.
+- Commit small and often; push the branch regularly so the team can see progress.
+
+**Issues & planning**
+- Create a GitHub **Issue per milestone** (M0–M10) with its checklist from §9; link the PR with `Closes #<n>`.
+- Track bugs, known issues and follow-ups as Issues with labels (`bug`, `enhancement`, `milestone:M3`, `desktop`, `server`, `web`, `good first issue`).
+- Optional: a GitHub **Project board** mirroring the milestone order.
+
+**CI/CD with GitHub Actions** (set up in M0)
+- `ci.yml` on every push/PR: install, lint, typecheck, unit tests, build; e2e (Playwright) on PRs to `main`.
+- `docker.yml`: build and publish the server image to **GitHub Container Registry** (`ghcr.io/cyber-taso/tliner`) on tags.
+- `desktop-release.yml` (M6+): build Tauri installers for Windows, macOS and Linux on version tags `v*.*.*` and attach them to a **GitHub Release**.
+- Use Dependabot (or Renovate) for dependency updates.
+
+**Releases**
+- Semantic versioning. Tag `v0.1.0` after M2 (first usable review build), then bump per milestone.
+- Each release gets notes generated from merged PRs.
+
+**Secrets & safety**
+- Never commit `.env`, keys, tokens, credentials or customer media. Secrets for Actions go in **Settings → Secrets and variables → Actions**.
+- Keep large binaries and sample videos out of git; use a small generated test clip (FFmpeg `testsrc`) in tests.
+- The repo is currently **public** — assume everything committed is visible to the world. If it is made private later, nothing changes in the workflow.
+
+**Repo hygiene files** (create in M0): `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/` (bug, feature), `CONTRIBUTING.md` (how a teammate sets up and runs the project), `LICENSE` (ask the owner before choosing one; default to "All rights reserved" until told otherwise), `.editorconfig`.
+
+---
+
+Start with **M0** now: create the M0 issue, branch `m0-foundation`, build, open the PR.
